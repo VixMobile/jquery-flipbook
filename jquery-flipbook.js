@@ -1,62 +1,74 @@
-// the semi-colon before function invocation is a safety net against concatenated
-// scripts and/or other plugins which may not be closed properly.
-;(function ( $, window, document, undefined ) {
+;(function($, window, document, undefined) {
 
-  // undefined is used here as the undefined global variable in ECMAScript 3 is
-  // mutable (ie. it can be changed by someone else). undefined isn't really being
-  // passed in so we can ensure the value of it is truly undefined. In ES5, undefined
-  // can no longer be modified.
+  $.fn.flipbook = function() {
+    var flipbook = this;
 
-  // window and document are passed through as local variable rather than global
-  // as this (slightly) quickens the resolution process and can be more efficiently
-  // minified (especially when both are regularly referenced in your plugin).
+    var height = flipbook.data('height') || '300';
+    var width = flipbook.data('width') || '200';
+    // var pageCount = flipbook.data('pages') || '2';
 
-  // Create the defaults once
-  var pluginName = "defaultPluginName",
-    defaults = {
-      propertyName: "value"
+    var pages;
+    var oddPages;
+    var evenPages;
+
+    var currentPage = 0;
+    var pageCount;
+
+    var init = function() {
+      if(flipbook.find('.page').length % 2 == 1) {
+        flipbook.append('<div class="page"></div>');
+      }
+
+      pages = flipbook.find('.page');
+      oddPages = flipbook.find('.page:nth-child(odd)');
+      evenPages = flipbook.find('.page:nth-child(even)');
+      pageCount = pages.length;
+
+      flipbook.css('width', parseInt(width, 10)*2);
+      pages.css('height', height);
+      pages.css('width', width);
+
+      pages.each(function(index, page) {
+        if(index > 1) {
+          $(page).addClass('flipped');
+
+        }
+      });
     };
 
-  // The actual plugin constructor
-  function Plugin( element, options ) {
-    this.element = element;
-
-    // jQuery has an extend method which merges the contents of two or
-    // more objects, storing the result in the first object. The first object
-    // is generally empty as we don't want to alter the default options for
-    // future instances of the plugin
-    this.options = $.extend( {}, defaults, options );
-
-    this._defaults = defaults;
-    this._name = pluginName;
-
-    this.init();
-  }
-
-  Plugin.prototype = {
-
-    init: function() {
-      // Place initialization logic here
-      // You already have access to the DOM element and
-      // the options via the instance, e.g. this.element
-      // and this.options
-      // you can add more functions like the one below and
-      // call them like so: this.yourOtherFunction(this.element, this.options).
-    },
-
-    yourOtherFunction: function(el, options) {
-      // some logic
-    }
-  };
-
-  // A really lightweight plugin wrapper around the constructor,
-  // preventing against multiple instantiations
-  $.fn[pluginName] = function ( options ) {
-    return this.each(function () {
-      if (!$.data(this, "plugin_" + pluginName)) {
-        $.data(this, "plugin_" + pluginName, new Plugin( this, options ));
+    var flipForward = function() {
+      if(pageCount > (currentPage + 2)) {
+        // $(pages[currentPage]).toggleClass('flipped');
+        $(pages[currentPage+1]).addClass('flipped');
+        currentPage += 2;
+        $(pages[currentPage]).removeClass('flipped');
+        $(pages[currentPage+1]).removeClass('flipped');
       }
-    });
+    };
+
+    var flipBackward = function() {
+      if(currentPage !== 0) {
+        $(pages[currentPage]).addClass('flipped');
+        $(pages[currentPage+1]).addClass('flipped');
+        currentPage -= 2;
+        $(pages[currentPage]).removeClass('flipped');
+        $(pages[currentPage+1]).removeClass('flipped');
+      }
+    };
+
+    var goToFirstPage = function() {
+      $(pages[currentPage]).addClass('flipped');
+      $(pages[currentPage+1]).addClass('flipped');
+      $(pages[0]).removeClass('flipped');
+      $(pages[1]).removeClass('flipped');
+      currentPage = 0;
+    };
+
+    init();
+    oddPages.click(flipBackward);
+    evenPages.click(flipForward);
+    $('.flipbook-first-page').click(goToFirstPage);
+
   };
 
-})( jQuery, window, document );
+})(jQuery, window, document);
