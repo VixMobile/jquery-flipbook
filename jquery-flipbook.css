@@ -1,6 +1,9 @@
 .flipbook {
   position: relative;
-  background: #eee;
+  height: 90%;
+  width: 100%;
+  margin: 0 0 10px 0;
+  -webkit-box-shadow: 0 0 10px 2px #888;
 }
 
 .flipbook p {
@@ -11,25 +14,37 @@
 
 .flipbook .page {
   top: 0;
+  height: 100%;
   position: absolute;
   border: 1px solid #888;
   background: -webkit-linear-gradient(right, #eee 0%, #fcfcfc 5%, #fcfcfc 95%, #eee 100%);
-  opacity: 1;
-  transition-property: all;
+  transition-property: -webkit-transform;
   transition-duration: 1s;
 }
 
 .flipbook .page.flipped {
   -webkit-transform: rotateY(90deg);
+  z-index: 10;
+}
+
+.flipbook .page.invisible {
+  display: none;
 }
 
 .flipbook .page:nth-child(odd) {
   left: 0;
-  -webkit-transform-origin: 100%;
+  -webkit-transform-origin: 0%;
   transition-delay: 0.7s;
 }
 
 .flipbook .page:nth-child(even) {
   left: 50%;
   -webkit-transform-origin: 0%
+}
+
+.container {
+  height: 800px;
+  width: 600px;
+  padding: 10px;
+  /*background: pink;*/
 }
